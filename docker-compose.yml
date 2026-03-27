@@ -1,0 +1,14 @@
+services:
+  frontend:
+    image: xlizer1/kinetic-frontend:latest
+    container_name: kinetic-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+networks:
+  kinetic-network:
+    external: true
+    name: kinetic-backend_kinetic-network
