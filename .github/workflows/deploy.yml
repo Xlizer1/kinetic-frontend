@@ -48,23 +48,33 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             mkdir -p /opt/kite/kinetic-frontend
-            if [ ! -d /opt/kite/kinetic-frontend/.git ]; then
-              git clone git@github.com:Xlizer1/kinetic-frontend.git /opt/kite/kinetic-frontend
-            fi
-            cd /opt/kite/kinetic-frontend
-            git fetch origin
-            git checkout main
-            git pull origin main
             
-            # Tag current image as previous before pulling new one
+            if [ ! -f /opt/kite/kinetic-frontend/docker-compose.yml ]; then
+              cat > /opt/kite/kinetic-frontend/docker-compose.yml << 'ENDFILE'
+services:
+  frontend:
+    image: xlizer1/kinetic-frontend:latest
+    container_name: kinetic-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+networks:
+  kinetic-network:
+    external: true
+    name: kinetic-backend_kinetic-network
+ENDFILE
+            fi
+            
+            cd /opt/kite/kinetic-frontend
+            
             docker tag xlizer1/kinetic-frontend:latest xlizer1/kinetic-frontend:previous || true
             
-            # Pull new image
             docker compose pull frontend
             
-            # Restart container
             docker compose rm -f frontend 2>/dev/null || true
             docker compose up -d frontend
             
-            # Clean up old images on VPS (keep latest + previous)
             docker images --format "{{.Repository}}:{{.Tag}}" | grep "xlizer1/kinetic-frontend:" | grep -v "latest\|previous" | tail -n +3 | xargs -r docker rmi || true
