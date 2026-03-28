@@ -69,11 +69,19 @@ jobs:
             
             cd /opt/kite/kinetic-frontend
             
-            docker tag xlizer1/kinetic-frontend:latest xlizer1/kinetic-frontend:previous || true
+            # Always pull latest image
+            docker pull xlizer1/kinetic-frontend:latest
             
-            docker compose pull frontend
+            # Force remove any existing container (manually created or via compose)
+            docker rm -f kinetic-frontend 2>/dev/null || true
             
-            docker compose rm -f frontend 2>/dev/null || true
-            docker compose up -d frontend
+            # Start fresh container
+            docker run -d \
+              --name kinetic-frontend \
+              --network kinetic-backend_kinetic-network \
+              --restart unless-stopped \
+              -p 6769:80 \
+              xlizer1/kinetic-frontend:latest
             
+            # Clean up old images (keep latest + previous)
             docker images --format "{{.Repository}}:{{.Tag}}" | grep "xlizer1/kinetic-frontend:" | grep -v "latest\|previous" | tail -n +3 | xargs -r docker rmi || true
