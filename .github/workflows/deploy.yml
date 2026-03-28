@@ -52,22 +52,19 @@ jobs:
             mkdir -p /opt/kite/kinetic-frontend
             
             if [ ! -f /opt/kite/kinetic-frontend/docker-compose.yml ]; then
-              cat > /opt/kite/kinetic-frontend/docker-compose.yml << 'ENDFILE'
-services:
-  frontend:
-    image: xlizer1/kinetic-frontend:latest
-    container_name: kinetic-frontend
-    restart: unless-stopped
-    ports:
-      - "6769:80"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-
-networks:
-  kinetic-network:
-    external: true
-    name: kinetic-backend_kinetic-network
-ENDFILE
+              echo 'services:' > /opt/kite/kinetic-frontend/docker-compose.yml
+              echo '  frontend:' >> /opt/kite/kinetic-frontend/docker-compose.yml
+              echo '    image: xlizer1/kinetic-frontend:latest' >> /opt/kite/kinetic-frontend/docker-compose.yml
+              echo '    container_name: kinetic-frontend' >> /opt/kite/kinetic-frontend/docker-compose.yml
+              echo '    restart: unless-stopped' >> /opt/kite/kinetic-frontend/docker-compose.yml
+              echo '    ports:' >> /opt/kite/kinetic-frontend/docker-compose.yml
+              echo '      - "6769:80"' >> /opt/kite/kinetic-frontend/docker-compose.yml
+              echo '    extra_hosts:' >> /opt/kite/kinetic-frontend/docker-compose.yml
+              echo '      - "host.docker.internal:host-gateway"' >> /opt/kite/kinetic-frontend/docker-compose.yml
+              echo 'networks:' >> /opt/kite/kinetic-frontend/docker-compose.yml
+              echo '  kinetic-network:' >> /opt/kite/kinetic-frontend/docker-compose.yml
+              echo '    external: true' >> /opt/kite/kinetic-frontend/docker-compose.yml
+              echo '    name: kinetic-backend_kinetic-network' >> /opt/kite/kinetic-frontend/docker-compose.yml
             fi
             
             cd /opt/kite/kinetic-frontend
