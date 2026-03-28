@@ -39,6 +39,8 @@ jobs:
           cache-to: type=gha,mode=max
           build-args: |
             VERSION=${{ steps.version.outputs.VERSION }}
+            VITE_API_URL=https://api.kinetic.kite-app.online/api
+            VITE_WS_URL=wss://api.kinetic.kite-app.online/ws
 
       - name: Deploy to Production Server
         uses: appleboy/ssh-action@v1
@@ -57,7 +59,7 @@ services:
     container_name: kinetic-frontend
     restart: unless-stopped
     ports:
-      - "3000:80"
+      - "6769:80"
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
